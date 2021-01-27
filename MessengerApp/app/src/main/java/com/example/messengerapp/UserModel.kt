@@ -6,5 +6,5 @@ import com.google.gson.annotations.SerializedName
 
 data class UserModel(@SerializedName("_id") @Expose var id: String,
                      @SerializedName("name") @Expose var name: String,
-                     @SerializedName("count") @Expose var count: Int,
+                     @SerializedName("publicKey") @Expose var publicKey: String,
                      var online:Boolean = false)

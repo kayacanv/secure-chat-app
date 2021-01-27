@@ -12,24 +12,41 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.KeyPair
+
 
 class LoginActivity : AppCompatActivity() {
+
+
 
 override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_login)
 
-    if(PreferenceManager.getDefaultSharedPreferences(this).contains("USER")){
-      loginFunction(PreferenceManager.getDefaultSharedPreferences(this).getString("USER",""))
+  if(PreferenceManager.getDefaultSharedPreferences(this).contains("publicKey")){
+      val publicKeyString = PreferenceManager.getDefaultSharedPreferences(this).getString("publicKey","")!!
+      Singleton.publicKey = AES.stringToPublicKey(publicKeyString)
+      val privateKeyString = PreferenceManager.getDefaultSharedPreferences(this).getString("privateKey","")!!
+      Singleton.privateKey = AES.stringToPrivateKey(privateKeyString)
+    }
+    else {
+          var keys = AES.generateRSAKkeyPair()
+          Singleton.privateKey = keys.private
+          Singleton.publicKey = keys.public
+    }
+
+    if(PreferenceManager.getDefaultSharedPreferences(this).contains("USER")) {
+      loginFunction(PreferenceManager.getDefaultSharedPreferences(this).getString("USER","")!!)
     }
 
     loginButton.setOnClickListener {
       if (editTextUsername.text.isNotEmpty()) {
 
         var pref = PreferenceManager.getDefaultSharedPreferences(this).edit()
-        pref.putString("USER",editTextUsername.text.toString())
+        pref.putString("USER", editTextUsername.text.toString())
+        pref.putString("publicKey", AES.publicKeyToString(Singleton.publicKey))
+        pref.putString("privateKey", AES.privateKeyToString(Singleton.privateKey))
         pref.apply()
-
 
         loginFunction(editTextUsername.text.toString())
       }
@@ -39,6 +56,10 @@ override fun onCreate(savedInstanceState: Bundle?) {
   private fun loginFunction(name:String) {
     val jsonObject = JSONObject()
     jsonObject.put("name",name)
+
+    var stringPublicKey : String = AES.publicKeyToString(Singleton.publicKey)
+    jsonObject.put("publicKey", stringPublicKey)
+
     val jsonBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
         jsonObject.toString())
 

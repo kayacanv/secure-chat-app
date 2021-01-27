@@ -108,7 +108,7 @@ class ContactListActivity : AppCompatActivity(),
     val intent = Intent(this,ChatRoom::class.java)
     intent.putExtra(ChatRoom.EXTRA_ID,user.id)
     intent.putExtra(ChatRoom.EXTRA_NAME,user.name)
-    intent.putExtra(ChatRoom.EXTRA_COUNT,user.count)
+    intent.putExtra(ChatRoom.EXTRA_PUBLICKEY,user.publicKey)
     startActivity(intent)
   }
 

@@ -20,6 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 class ChatRoom : AppCompatActivity() {
@@ -27,12 +28,12 @@ class ChatRoom : AppCompatActivity() {
   companion object {
     const val EXTRA_ID = "id"
     const val EXTRA_NAME = "name"
-    const val EXTRA_COUNT = "numb"
+    const val EXTRA_PUBLICKEY = "publicKey"
   }
 
   private lateinit var contactName: String
   private lateinit var contactId: String
-  private var contactNumb: Int = -1
+  private lateinit var contactPublicKey: String
   lateinit var nameOfChannel: String
   val mAdapter = ChatRoomAdapter(ArrayList())
 
@@ -47,9 +48,9 @@ class ChatRoom : AppCompatActivity() {
 
 
   private fun fetchExtras() {
-    contactName = intent.extras.getString(ChatRoom.EXTRA_NAME)
-    contactId = intent.extras.getString(ChatRoom.EXTRA_ID)
-    contactNumb = intent.extras.getInt(ChatRoom.EXTRA_COUNT)
+    contactName = intent.extras?.getString(EXTRA_NAME)!!
+    contactId = intent.extras?.getString(EXTRA_ID)!!
+    contactPublicKey = intent.extras?.getString(EXTRA_PUBLICKEY)!!
   }
 
 
@@ -81,8 +82,17 @@ class ChatRoom : AppCompatActivity() {
       override fun onEvent(channelName: String?, eventName: String?, data: String?) {
 
         val jsonObject = JSONObject(data)
+
+        val cipher_text = jsonObject.getString("message")
+
+        var plain_text = ""
+        if(jsonObject.getString("sender_id") == contactId)
+            plain_text = AES.do_RSADecryption(cipher_text, Singleton.privateKey)
+        else
+            return
+
         val messageModel = MessageModel(
-            jsonObject.getString("message"),
+            plain_text,
             jsonObject.getString("sender_id"))
 
         runOnUiThread {
@@ -108,11 +118,23 @@ class ChatRoom : AppCompatActivity() {
     sendButton.setOnClickListener{
       if (editText.text.isNotEmpty()){
         val jsonObject = JSONObject()
-        jsonObject.put("message",editText.text.toString())
-        jsonObject.put("channel_name",nameOfChannel)
-        jsonObject.put("sender_id",Singleton.getInstance().currentUser.id)
+
+        val plain_text = editText.text.toString()
+        val cipher_text = AES.do_RSAEncryption(plain_text, AES.stringToPublicKey(contactPublicKey))
+        jsonObject.put("message", cipher_text)
+
+
+        jsonObject.put("channel_name", nameOfChannel)
+        jsonObject.put("sender_id", Singleton.getInstance().currentUser.id)
         val jsonBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
             jsonObject.toString())
+
+        val messageModel = MessageModel(
+                plain_text,
+                Singleton.getInstance().currentUser.id)
+        runOnUiThread {
+          mAdapter.add(messageModel)
+        }
 
         RetrofitInstance.retrofit.sendMessage(jsonBody).enqueue(object: Callback<String>{
           override fun onFailure(call: Call<String>?, t: Throwable?) {
