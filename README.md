@@ -2,6 +2,8 @@
 
 ## CMPE 494 - Free Security Project Report
 ### Kayacan Vesek - Adil Numan Çelik
+#### Presentation Video:
+https://youtu.be/CX5UxDRjpg8
 ### Description
 	In the last few weeks, messaging apps were one of the main topics in social media. So, we wanted to design a secure app for customers, Secure Chat App provides an end-to-end messaging by using asymmetric encryption.
 
