@@ -27,9 +27,9 @@ class ContactListActivity : AppCompatActivity(),
     setContentView(R.layout.activity_contact_list)
     setupRecyclerView()
 
-//    Timer().scheduleAtFixedRate(timerTask {
+    Timer().scheduleAtFixedRate(timerTask {
       fetchUsers()
-//    },0,4000)
+    },0,4000)
 
     subscribeToChannel()
   }
