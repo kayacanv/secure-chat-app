@@ -19,8 +19,6 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.Exception
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 class ChatRoom : AppCompatActivity() {
@@ -63,7 +61,7 @@ class ChatRoom : AppCompatActivity() {
 
 
   private fun subscribeToChannel() {
-    val authorizer = HttpAuthorizer("http://10.0.2.2:5000/pusher/auth/private")
+    val authorizer = HttpAuthorizer("http://138.68.111.102:5000/pusher/auth/private")
     val options = PusherOptions().setAuthorizer(authorizer)
     options.setCluster("eu")
 

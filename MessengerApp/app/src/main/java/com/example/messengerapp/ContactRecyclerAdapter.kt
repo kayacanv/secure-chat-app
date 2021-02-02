@@ -43,8 +43,12 @@ class ContactRecyclerAdapter(private var list: ArrayList<UserModel>, private var
       }
     }
   }
-
+  fun reset() {
+    list.clear()
+  }
   fun add(user: UserModel) {
+//    if(list.contains(user))
+//        return
     list.add(user)
     notifyDataSetChanged()
   }

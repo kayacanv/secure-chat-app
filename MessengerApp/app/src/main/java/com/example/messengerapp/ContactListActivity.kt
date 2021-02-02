@@ -14,6 +14,9 @@ import kotlinx.android.synthetic.main.activity_contact_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.timerTask
 
 class ContactListActivity : AppCompatActivity(),
     ContactRecyclerAdapter.UserClickListener {
@@ -23,7 +26,11 @@ class ContactListActivity : AppCompatActivity(),
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_contact_list)
     setupRecyclerView()
-    fetchUsers()
+
+//    Timer().scheduleAtFixedRate(timerTask {
+      fetchUsers()
+//    },0,4000)
+
     subscribeToChannel()
   }
 
@@ -57,7 +64,7 @@ class ContactListActivity : AppCompatActivity(),
 
   private fun subscribeToChannel() {
 
-    val authorizer = HttpAuthorizer("http://10.0.2.2:5000/pusher/auth/presence")
+    val authorizer = HttpAuthorizer("http://138.68.111.102:5000/pusher/auth/presence")
     val options = PusherOptions().setAuthorizer(authorizer)
     options.setCluster("eu")
 
